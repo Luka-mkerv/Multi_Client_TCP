@@ -4,7 +4,7 @@ import time
 import os
 from datetime import datetime
 
-HOST = '127.0.0.1'
+HOST = '0.0.0.0'
 PORT = 5000
 STATS_INTERVAL = 5
 MAX_LOG_LINES = 1000
