@@ -25,15 +25,25 @@ socket programming, broadcast messaging, and load testing.
 # or
 python3 server.py
 ```
-Server always runs on **port 5000**. You can override:
+Server runs on **port 5000** by default. You can override:
 ```bash
 python3 server.py 9999
 ```
 
-### 2. Connect as a human user (separate terminal)
+Find your machine's IP address so others can connect:
 ```bash
-python3 client.py 5000 alice
-python3 client.py 5000 bob
+ip addr show | grep "inet " | grep -v 127.0.0.1
+```
+Share this IP with anyone who wants to connect.
+
+### 2. Connect from any machine on the same network
+```bash
+python3 client.py <server-ip> 5000 <your name>
+python3 client.py <server-ip> 5000 <your name*>
+```
+Replace `<server-ip>` with the actual IP of the machine running the server. For example:
+```bash
+python3 client.py 192.168.1.45 5000 Luka
 ```
 Type messages and press Enter to chat. Human messages are saved to `chat.log` and printed in the server terminal with a per-user message count.
 
@@ -43,6 +53,21 @@ Type messages and press Enter to chat. Human messages are saved to `chat.log` an
 # 50 bots, 2 messages/sec each → ~100 msg/sec total
 ```
 Load bot traffic goes silently to `server.log` only — it does not appear in your terminal and does **not** interfere with human clients.
+
+---
+
+## Classroom Setup
+
+The server runs on one machine (the professor's laptop). Students connect from their own laptops over the university WiFi — each student is a real thread on the server.
+```
+Server laptop              Student laptops
+──────────────────              ───────────────────────────────────────
+python3 server.py               python3 client.py 192.168.1.45 5000 Shota
+                                python3 client.py 192.168.1.45 5000 Luka
+                                python3 client.py 192.168.1.45 5000 irakli
+```
+
+The server terminal shows a new thread spawning for every student that connects — that's multithreading live in action.
 
 ---
 
@@ -129,7 +154,7 @@ Press `Ctrl+C` to stop all bots cleanly.
 ```
 Terminal 1          Terminal 2                   Terminal 3
 ──────────          ──────────                   ──────────
-./start.sh          ./stress_test.sh 5000 50 2   python3 client.py 5000 alice
+./start.sh          ./stress_test.sh 5000 50 2   python3 client.py 192.168.1.45 5000 alice
 ```
 
 ---
@@ -154,8 +179,8 @@ Terminal 1          Terminal 2                   Terminal 3
        ┌───────┼──────────────────────┐
        │       │                      │
   ┌─────────┐  │            ┌─────────────────────┐
-  │ alice   │  │            │  load_test.py × N   │
-  │ bob     │  │            │  (stress_test.sh)   │
+  │ shota   │  │            │  load_test.py × N   │
+  │ luk     │  │            │  (stress_test.sh)   │
   │(client) │  │            └─────────────────────┘
   └─────────┘  │
           ┌─────────┐
@@ -193,7 +218,7 @@ This lab uses **threading** — one OS thread per client. The Week 1 lab used **
 ## Troubleshooting
 
 **"Connection refused"**
-Server isn't running. Start it first: `./start.sh`
+Server isn't running, or you're using the wrong IP. Check the server is up and use the correct IP from `ip addr show`.
 
 **"Address already in use"**
 Port 5000 is taken. Find and kill the process:
