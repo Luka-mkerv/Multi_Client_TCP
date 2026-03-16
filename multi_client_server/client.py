@@ -2,7 +2,7 @@ import socket
 import threading
 import sys
 
-HOST = '127.0.0.1'
+HOST = sys.argv[1] if len(sys.argv) > 1 else '127.0.0.1'
 PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 5000
 NAME = sys.argv[2] if len(sys.argv) > 2 else 'anonymous'
 
